@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>অ্যাডমিন প্যানেল - প্রতিযোগিতা</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body class="bg-slate-50 min-h-screen p-4 sm:p-8">
+  <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+    <div class="flex flex-col sm:flex-row justify-between items-center pb-6 border-b border-slate-100 gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-800">নিবন্ধিত ক্যান্ডিডেট তালিকা</h1>
+        <p class="text-sm text-slate-500">মোট আবেদন এবং পিডিএফ ডাউনলোড করুন</p>
+      </div>
+      <button onclick="fetchData()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-xl text-sm transition">
+        তালিকা রিফ্রেশ করুন
+      </button>
+    </div>
+
+    <div class="overflow-x-auto mt-6">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider">
+            <th class="p-3.5 rounded-l-lg">রোল নং</th>
+            <th class="p-3.5">নাম</th>
+            <th class="p-3.5">মোবাইল</th>
+            <th class="p-3.5">প্রতিষ্ঠান</th>
+            <th class="p-3.5">মেথড</th>
+            <th class="p-3.5">TrxID</th>
+            <th class="p-3.5 text-center rounded-r-lg">ডকুমেন্ট</th>
+          </tr>
+        </thead>
+        <tbody id="candidateList" class="text-sm divide-y divide-slate-100">
+          <tr><td colspan="7" class="p-4 text-center text-slate-400">ডাটা লোড হচ্ছে...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- গোপন পিডিএফ টেমপ্লেট -->
+  <div id="pdfTemplate" class="hidden p-8 bg-white" style="width: 550px;">
+    <div style="border: 2px solid #2563eb; padding: 24px; border-radius: 12px; font-family: sans-serif;">
+      <h2 style="text-align: center; font-size: 20px; font-weight: bold; color: #1e3a8a; margin-bottom: 2px;">প্রতিযোগিতা রেজিস্ট্রেশন কপি</h2>
+      <p style="text-align: center; font-size: 11px; color: #64748b; margin-bottom: 24px;">অফিশিয়াল ভেরিফায়েড স্লিপ</p>
+      <div style="line-height: 2.2; font-size: 14px; color: #334155;">
+        <p><strong>রোল নম্বর:</strong> <span id="pdfRoll" style="color: #2563eb; font-weight: bold; font-size: 16px;"></span></p>
+        <p><strong>নাম:</strong> <span id="pdfName"></span></p>
+        <p><strong>মোবাইল:</strong> <span id="pdfPhone"></span></p>
+        <p><strong>শিক্ষা প্রতিষ্ঠান/জেলা:</strong> <span id="pdfInst"></span></p>
+        <p><strong>পেমেন্ট মেথড:</strong> <span id="pdfMethod"></span></p>
+        <p><strong>ট্রানজাকশন আইডি:</strong> <span id="pdfTrx" style="font-family: monospace; font-weight: bold;"></span></p>
+      </div>
+      <div style="margin-top: 30px; border-top: 1px dashed #cbd5e1; padding-top: 10px; text-align: center; font-size: 10px; color: #94a3b8;">
+        স্বয়ংক্রিয়ভাবে তৈরি সিস্টেম ডকুমেন্ট
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://ptclpuznrnjkjubxxpbw.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB0Y2xwdXpucm5qa2p1Ynh4cGJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyOTUzNjUsImV4cCI6MjEwNjg3MTM2NX0.NX3BAU-whRIX_RhRnln8vn-JNU0WLA18DESK5-dxvBg";
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function fetchData() {
+      const list = document.getElementById('candidateList');
+      list.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400">ডাটা লোড হচ্ছে...</td></tr>`;
+
+      const { data, error } = await supabaseClient
+        .from('registrations')
+        .select('*')
+        .order('id', { ascending: false });
+
+      if (error) {
+        alert("ত্রুটি: " + error.message);
+        return;
+      }
+
+      if (data.length === 0) {
+        list.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400">এখনো কোনো আবেদন জমা পড়েনি।</td></tr>`;
+        return;
+      }
+
+      list.innerHTML = "";
+      data.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition";
+        tr.innerHTML = `
+          <td class="p-3.5 font-bold text-blue-600 font-mono">${item.roll_number}</td>
+          <td class="p-3.5 font-medium text-slate-800">${item.full_name}</td>
+          <td class="p-3.5 text-slate-600">${item.phone}</td>
+          <td class="p-3.5 text-slate-600">${item.institution}</td>
+          <td class="p-3.5 text-slate-600">${item.payment_method}</td>
+          <td class="p-3.5 font-mono text-xs uppercase bg-slate-100 rounded px-2 py-1 inline-block my-2">${item.transaction_id}</td>
+          <td class="p-3.5 text-center">
+            <button onclick='downloadPDF(${JSON.stringify(item)})' class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-sm transition">
+              PDF ডাউনলোড
+            </button>
+          </td>
+        `;
+        list.appendChild(tr);
+      });
+    }
+
+    function downloadPDF(item) {
+      document.getElementById('pdfRoll').innerText = item.roll_number;
+      document.getElementById('pdfName').innerText = item.full_name;
+      document.getElementById('pdfPhone').innerText = item.phone;
+      document.getElementById('pdfInst').innerText = item.institution;
+      document.getElementById('pdfMethod').innerText = item.payment_method;
+      document.getElementById('pdfTrx').innerText = item.transaction_id;
+
+      const element = document.getElementById('pdfTemplate');
+      element.classList.remove('hidden');
+
+      const opt = {
+        margin: 10,
+        filename: `${item.roll_number}_form.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a5', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(element).save().then(() => {
+        element.classList.add('hidden');
+      });
+    }
+
+    fetchData();
+  </script>
+</body>
+</html>
