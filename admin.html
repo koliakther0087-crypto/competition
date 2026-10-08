@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>অ্যাডমিন প্যানেল - প্রতিযোগিতা</title>
+  <title>Admin Panel - An-Nur Competition</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
-<body class="bg-slate-50 min-h-screen p-4 sm:p-8">
-  <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-    <div class="flex flex-col sm:flex-row justify-between items-center pb-6 border-b border-slate-100 gap-4">
+<body class="bg-slate-100 min-h-screen p-4 sm:p-8">
+  <div class="max-w-7xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+    <div class="flex flex-col sm:flex-row justify-between items-center pb-6 border-b border-slate-200 gap-4">
       <div>
         <h1 class="text-2xl font-bold text-slate-800">নিবন্ধিত ক্যান্ডিডেট তালিকা</h1>
-        <p class="text-sm text-slate-500">মোট আবেদন এবং পিডিএফ ডাউনলোড করুন</p>
+        <p class="text-xs text-slate-500 mt-1">AN-NUR INTERNATIONAL HIFZUL QURAN COMPETITION 2026</p>
       </div>
-      <button onclick="fetchData()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-xl text-sm transition">
+      <button onclick="fetchData()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-medium px-5 py-2.5 rounded-xl text-sm transition">
         তালিকা রিফ্রেশ করুন
       </button>
     </div>
@@ -27,10 +27,10 @@
             <th class="p-3.5 rounded-l-lg">রোল নং</th>
             <th class="p-3.5">নাম</th>
             <th class="p-3.5">মোবাইল</th>
-            <th class="p-3.5">প্রতিষ্ঠান</th>
-            <th class="p-3.5">মেথড</th>
+            <th class="p-3.5">বিবরণ / গ্রুপ / জেলা</th>
+            <th class="p-3.5">পদ্ধতি</th>
             <th class="p-3.5">TrxID</th>
-            <th class="p-3.5 text-center rounded-r-lg">ডকুমেন্ট</th>
+            <th class="p-3.5 text-center rounded-r-lg">অ্যাকশন</th>
           </tr>
         </thead>
         <tbody id="candidateList" class="text-sm divide-y divide-slate-100">
@@ -40,22 +40,73 @@
     </div>
   </div>
 
-  <!-- গোপন পিডিএফ টেমপ্লেট -->
-  <div id="pdfTemplate" class="hidden p-8 bg-white" style="width: 550px;">
-    <div style="border: 2px solid #2563eb; padding: 24px; border-radius: 12px; font-family: sans-serif;">
-      <h2 style="text-align: center; font-size: 20px; font-weight: bold; color: #1e3a8a; margin-bottom: 2px;">প্রতিযোগিতা রেজিস্ট্রেশন কপি</h2>
-      <p style="text-align: center; font-size: 11px; color: #64748b; margin-bottom: 24px;">অফিশিয়াল ভেরিফায়েড স্লিপ</p>
-      <div style="line-height: 2.2; font-size: 14px; color: #334155;">
-        <p><strong>রোল নম্বর:</strong> <span id="pdfRoll" style="color: #2563eb; font-weight: bold; font-size: 16px;"></span></p>
-        <p><strong>নাম:</strong> <span id="pdfName"></span></p>
-        <p><strong>মোবাইল:</strong> <span id="pdfPhone"></span></p>
-        <p><strong>শিক্ষা প্রতিষ্ঠান/জেলা:</strong> <span id="pdfInst"></span></p>
-        <p><strong>পেমেন্ট মেথড:</strong> <span id="pdfMethod"></span></p>
-        <p><strong>ট্রানজাকশন আইডি:</strong> <span id="pdfTrx" style="font-family: monospace; font-weight: bold;"></span></p>
+  <!-- Professional Hard-Copy PDF Slip Template -->
+  <div id="pdfTemplate" class="hidden p-6 bg-white" style="width: 580px; font-family: sans-serif; color: #1e293b;">
+    <div style="border: 2px solid #065f46; border-radius: 12px; padding: 24px; position: relative; background: #ffffff;">
+      
+      <!-- Header with Logo -->
+      <div style="text-align: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 14px; margin-bottom: 16px;">
+        <div style="width: 55px; height: 55px; margin: 0 auto 6px auto;">
+          <svg viewBox="0 0 100 100" fill="none">
+            <circle cx="50" cy="50" r="46" fill="#064e3b" stroke="#f59e0b" stroke-width="2"/>
+            <path d="M25,80 L25,45 C25,25 50,15 50,15 C50,15 75,25 75,45 L75,80 Z" stroke="#fbbf24" stroke-width="1.5" fill="none"/>
+            <path d="M50,42 C46,38 38,40 34,44 L34,51 C38,48 46,47 50,50 Z" fill="#ffffff"/>
+            <path d="M50,42 C54,38 62,40 66,44 L66,51 C62,48 54,47 50,50 Z" fill="#ffffff"/>
+            <polygon points="40,51 60,62 56,64 36,53" fill="#fbbf24"/>
+            <polygon points="60,51 40,62 44,64 64,53" fill="#d97706"/>
+          </svg>
+        </div>
+        <h2 style="font-size: 18px; font-weight: bold; color: #065f46; margin: 0; letter-spacing: 1px;">AN-NUR INTERNATIONAL</h2>
+        <p style="font-size: 12px; font-weight: 600; color: #b45309; margin: 2px 0 0 0;">HIFZUL QURAN COMPETITION 2026</p>
+        <span style="display: inline-block; background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; font-size: 10px; font-weight: bold; padding: 2px 10px; border-radius: 20px; margin-top: 6px;">
+          OFFICIAL REGISTRATION SLIP
+        </span>
       </div>
-      <div style="margin-top: 30px; border-top: 1px dashed #cbd5e1; padding-top: 10px; text-align: center; font-size: 10px; color: #94a3b8;">
-        স্বয়ংক্রিয়ভাবে তৈরি সিস্টেম ডকুমেন্ট
+
+      <!-- Candidate Data -->
+      <table style="width: 100%; font-size: 13px; line-height: 2; margin-bottom: 20px;">
+        <tr>
+          <td style="width: 35%; font-weight: bold; color: #475569;">অফিশিয়াল রোল নম্বর:</td>
+          <td style="width: 65%; font-weight: 800; font-size: 15px; color: #047857;" id="pdfRoll"></td>
+        </tr>
+        <tr>
+          <td style="font-weight: bold; color: #475569;">প্রতিযোগীর পূর্ণ নাম:</td>
+          <td style="font-weight: 600;" id="pdfName"></td>
+        </tr>
+        <tr>
+          <td style="font-weight: bold; color: #475569;">মোবাইল নম্বর:</td>
+          <td id="pdfPhone"></td>
+        </tr>
+        <tr>
+          <td style="font-weight: bold; color: #475569;">বিবরণ / গ্রুপ / জেলা:</td>
+          <td id="pdfInst" style="font-size: 12px;"></td>
+        </tr>
+        <tr>
+          <td style="font-weight: bold; color: #475569;">পেমেন্ট মেথড:</td>
+          <td id="pdfMethod"></td>
+        </tr>
+        <tr>
+          <td style="font-weight: bold; color: #475569;">ট্রানজাকশন আইডি (TrxID):</td>
+          <td id="pdfTrx" style="font-family: monospace; font-weight: bold; color: #0f172a;"></td>
+        </tr>
+      </table>
+
+      <!-- Instructions & Verification Box -->
+      <div style="border-top: 1px dashed #cbd5e1; padding-top: 12px; font-size: 10px; color: #64748b; line-height: 1.5;">
+        <p>• এই স্লিপটি জেলা, বিভাগীয় ও ডিসেম্বর ফাইনাল অডিশনের সময় সঙ্গে আনতে হবে।</p>
+        <p>• ভুল বা অসত্য তথ্য প্রদান করলে প্রার্থিতা বাতিল বলে গণ্য হবে।</p>
       </div>
+
+      <div style="margin-top: 30px; display: flex; justify-content: space-between; align-items: flex-end;">
+        <div style="text-align: center;">
+          <div style="font-size: 10px; color: #94a3b8;">System Generated</div>
+          <div style="font-size: 9px; color: #cbd5e1;">No Signature Required</div>
+        </div>
+        <div style="text-align: center; border-top: 1px solid #475569; width: 140px; padding-top: 4px; font-size: 11px; font-weight: bold; color: #334155;">
+          কর্তৃপক্ষের স্বাক্ষর
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -88,15 +139,15 @@
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-50 transition";
         tr.innerHTML = `
-          <td class="p-3.5 font-bold text-blue-600 font-mono">${item.roll_number}</td>
+          <td class="p-3.5 font-bold text-emerald-700 font-mono">${item.roll_number}</td>
           <td class="p-3.5 font-medium text-slate-800">${item.full_name}</td>
           <td class="p-3.5 text-slate-600">${item.phone}</td>
-          <td class="p-3.5 text-slate-600">${item.institution}</td>
+          <td class="p-3.5 text-slate-600 text-xs">${item.institution}</td>
           <td class="p-3.5 text-slate-600">${item.payment_method}</td>
           <td class="p-3.5 font-mono text-xs uppercase bg-slate-100 rounded px-2 py-1 inline-block my-2">${item.transaction_id}</td>
           <td class="p-3.5 text-center">
-            <button onclick='downloadPDF(${JSON.stringify(item)})' class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-sm transition">
-              PDF ডাউনলোড
+            <button onclick='downloadPDF(${JSON.stringify(item)})' class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-sm transition">
+              PDF স্লিপ
             </button>
           </td>
         `;
@@ -116,8 +167,8 @@
       element.classList.remove('hidden');
 
       const opt = {
-        margin: 10,
-        filename: `${item.roll_number}_form.pdf`,
+        margin: 8,
+        filename: `${item.roll_number}_Official_Slip.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2 },
         jsPDF: { unit: 'mm', format: 'a5', orientation: 'portrait' }
